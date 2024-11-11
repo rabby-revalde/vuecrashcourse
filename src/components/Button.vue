@@ -1,13 +1,14 @@
 <script setup>
-import { defineProps } from "vue";
-
 defineProps({
-  openModal: Function,
+  className: String,
 });
 </script>
 <template>
   <button
-    class="h-[36px] bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg text-center text-sm"
+    :class="[
+      `h-[36px] bg-primary hover:bg-secondary text-white px-4 py-2  rounded text-center text-sm`,
+      `${className}`,
+    ]"
   >
     <slot></slot>
   </button>

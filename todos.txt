@@ -1,0 +1,1 @@
+- debug sorting after update a contact

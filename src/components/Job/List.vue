@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, ref, computed } from "vue";
+import { ref, computed } from "vue";
 import { RouterLink } from "vue-router";
 
 const props = defineProps({
@@ -34,7 +34,7 @@ const props = defineProps({
       ></i>
       <i
         @click="deleteContact(contact?.id)"
-        class="pi pi-trash text-red-400 mx-1 cursor-pointer"
+        class="pi pi-trash text-red-900 mx-1 cursor-pointer"
       ></i>
     </li>
   </ul>

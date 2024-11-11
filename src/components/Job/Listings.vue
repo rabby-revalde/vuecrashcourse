@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, onMounted } from "vue";
+import { ref } from "vue";
 import { useContactsStore } from "@/stores/contactStore";
 import { RouterLink } from "vue-router";
 import GridView from "./GridList.vue";
@@ -29,6 +29,7 @@ const contactTarget = ref({});
 
 const closeModal = () => {
   isOpen.value = false;
+  isEdit.value = false;
 };
 const openModal = () => {
   isOpen.value = true;
@@ -48,8 +49,6 @@ const addNewContact = () => {
 const deleteContact = (id) => {
   contactStore.deleteContact(id);
 };
-
-onMounted(() => contactStore.fetchContacts());
 </script>
 
 <template>
@@ -60,11 +59,11 @@ onMounted(() => contactStore.fetchContacts());
     :isEdit="isEdit"
     :selectedID="selectedID"
   />
-  <!-- <EditModal :closeModal="closeModal" :isOpen="isOpen" :job="job" /> -->
+
   <section class="bg-blue-50 px-4 py-10">
-    <div class="container-xl md:container m-auto">
+    <div class="container m-auto">
       <div class="flex mb-5">
-        <div class="self-center mb-4">
+        <div class="mb-4">
           <h2 class="text-3xl font-bold text-primary mb-3">
             Contacts Information
           </h2>
@@ -73,9 +72,7 @@ onMounted(() => contactStore.fetchContacts());
             click on the Add new contact button.
           </p>
         </div>
-      </div>
-      <div class="flex pb-4">
-        <div class="mode-view ml-auto flex" v-if="!isShowButton">
+        <div class="mode-view ml-auto flex self-end" v-if="!isShowButton">
           <div class="self-center mr-10">
             <ButtonComponent @click="addNewContact" type="button">
               + Add new contact
@@ -95,6 +92,7 @@ onMounted(() => contactStore.fetchContacts());
           </div>
         </div>
       </div>
+
       <!-- show loading spinner on fetch -->
       <div v-if="contactStore.isLoading" class="text-center text-gray-500 py-6">
         <PulseLoader />
@@ -102,10 +100,10 @@ onMounted(() => contactStore.fetchContacts());
       <div v-else class="border-t pt-6">
         <div
           v-if="isActiveView"
-          class="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4"
+          class="grid grid-cols-1 lg:grid-cols-3 sm:grid-cols-2 gap-4"
         >
           <GridView
-            v-for="(contact, index) in contactStore.contacts.slice(
+            v-for="(contact, index) in contactStore.sortedContacts.slice(
               0,
               limit || contactStore.contacts.length
             )"

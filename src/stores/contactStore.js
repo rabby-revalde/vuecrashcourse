@@ -11,8 +11,16 @@ export const useContactsStore = defineStore("contacts", {
     error: null,
     contact: {},
   }),
+  getters: {
+    sortedContacts() {
+      return this.contacts.sort(
+        (a, b) => new Date(b.created_At) - new Date(a.created_At)
+      );
+    },
+  },
   actions: {
     async fetchContacts() {
+      console.log("called Fetch all contacts api");
       this.isLoading = true;
       try {
         const response = await axios.get("/api/contacts");
@@ -37,9 +45,9 @@ export const useContactsStore = defineStore("contacts", {
     },
     async createJob(newJob) {
       this.isLoading = true;
+
       try {
         const res = await axios.post("/api/contacts", newJob);
-        this.isLoading = false;
         router.push(`/contacts/${res.data.id}`);
         toast.success("Contact added successfully!", {
           position: "bottom-right",
@@ -49,19 +57,20 @@ export const useContactsStore = defineStore("contacts", {
         toast.error("Fetch error!", {
           position: "bottom-right",
         });
+      } finally {
+        this.isLoading = false;
+        this.fetchContacts();
       }
     },
     async deleteContact(id) {
       this.isLoading = true;
-      const confirmDel = confirm("Are you sure to delete this Contact?");
+
       try {
-        if (confirmDel) {
-          await axios.delete(`/api/contacts/${id}`);
-          router.push(`/contacts`);
-          toast.success("Job Deleted Successfuly!", {
-            position: "bottom-right",
-          });
-        }
+        await axios.delete(`/api/contacts/${id}`);
+        router.push(`/contacts`);
+        toast.success("Job Deleted Successfuly!", {
+          position: "bottom-right",
+        });
       } catch (error) {
         console.error("Fetch error", error);
         toast.error("Contact Not Deleted!", {
@@ -74,6 +83,7 @@ export const useContactsStore = defineStore("contacts", {
     },
     async updateContact(id, updatedJob) {
       this.isLoading = true;
+
       try {
         const res = await axios.put(`/api/contacts/${id}`, updatedJob);
         router.push(`/contacts/${res.data.id}`);
@@ -87,6 +97,7 @@ export const useContactsStore = defineStore("contacts", {
         });
       } finally {
         this.isLoading = false;
+        this.fetchContacts();
       }
     },
   },

@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, defineProps, watch, computed, toRefs } from "vue";
+import { reactive, watch } from "vue";
 import {
   TransitionRoot,
   TransitionChild,
@@ -22,6 +22,7 @@ const form = reactive({
   name: props.contactTarget?.name || "",
   email: props.contactTarget?.email || "",
   phone: props.contactTarget?.phone || "",
+  created_At: props.contactTarget?.created_At || "",
 });
 
 let isValidate = reactive({
@@ -30,14 +31,14 @@ let isValidate = reactive({
   phone: "",
 });
 
-// const { isName, isEmail, isPhone } = toRefs(isValidate);
-
 const handleSubmit = () => {
   const contact = {
     name: form.name,
     email: form.email,
     phone: form.phone,
+    transaction: [],
   };
+
   const { isValid } = useValidateContact(contact);
 
   isValidate.name = isValid.value.name;
@@ -48,9 +49,15 @@ const handleSubmit = () => {
     return;
   } else {
     if (props.isEdit) {
-      contactStore.updateContact(props.selectedID, contact);
+      const updateContact = {
+        ...contact,
+        created_At: form.created_At,
+        updated_At: new Date().toLocaleDateString(),
+      };
+      contactStore.updateContact(props.selectedID, updateContact);
     } else {
-      contactStore.createJob(contact);
+      const ajob = { ...contact, created_At: new Date().toLocaleDateString() };
+      contactStore.createJob(ajob);
     }
   }
 };
@@ -62,7 +69,24 @@ watch(
       form.name = newTarget.name;
       form.email = newTarget.email;
       form.phone = newTarget.phone;
+      form.created_At = newTarget.created_At;
     }
+
+    console.log(form);
+  },
+  { immediate: true }
+);
+
+watch(
+  () => props.isEdit,
+  (newTarget) => {
+    if (!newTarget) {
+      form.name = "";
+      form.email = "";
+      form.phone = "";
+    }
+
+    console.log(form);
   },
   { immediate: true }
 );
@@ -114,6 +138,7 @@ watch(
                           class="block text-gray-700 font-bold mb-2"
                           >Name
                         </label>
+
                         <input
                           type="text"
                           v-model="form.name"
@@ -181,8 +206,7 @@ watch(
                           v-if="isValidate.phone === false"
                           class="text-[10px] text-red-600 mt-1"
                         >
-                          Required and use format (123) 456-7890 or 123-456-7890
-                          or 9876554321.
+                          Required and should be 11-digits
                         </p>
                       </div>
 
